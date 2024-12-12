@@ -1,63 +1,63 @@
-use petgraph::graph::{Graph, NodeIndex};
-use petgraph::Undirected;
-use std::fs::File;
-use std::io::BufReader;
-use csv::Reader;
+use std::collections::HashMap;
 
 #[derive(Debug)]
-pub struct CarNode {
-    pub id: usize,
-    pub price: f64,
-    pub mileage: f64,
+// Represents a graph with nodes and edges, where nodes are strings and edges are pairs of node indices.
+pub struct Graph {
+    nodes: Vec<String>,
+    edges: Vec<(usize, usize)>,
 }
 
-pub struct GraphBuilder {
-    graph: Graph<CarNode, f64, Undirected>,
-}
-
-impl GraphBuilder {
+impl Graph {
+    // Creates a new empty graph.
     pub fn new() -> Self {
         Self {
-            graph: Graph::new_undirected(),
+            nodes: Vec::new(),
+            edges: Vec::new(),
         }
     }
 
-    pub fn load_from_csv(file_path: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let file = File::open(file_path)?;
-        let mut rdr = Reader::from_reader(BufReader::new(file));
-        let mut builder = Self::new();
-
-        for (idx, result) in rdr.records().enumerate() {
-            let record = result?;
-            let price: f64 = record.get(1).unwrap_or("0").parse()?;
-            let mileage: f64 = record.get(2).unwrap_or("0").parse()?;
-            builder.graph.add_node(CarNode { id: idx, price, mileage });
-        }
-
-        Ok(builder)
-    }
-
-    pub fn add_edges(&mut self, threshold: f64) {
-        let nodes: Vec<_> = self.graph.node_references().collect();
-        for i in 0..nodes.len() {
-            for j in (i + 1)..nodes.len() {
-                let similarity = Self::calculate_similarity(
-                    &nodes[i].1,
-                    &nodes[j].1,
-                );
-                if similarity > threshold {
-                    self.graph.add_edge(nodes[i].0, nodes[j].0, similarity);
-                }
-            }
+    // Adds a node to the graph if it does not already exist.
+    pub fn add_node(&mut self, node: String) {
+        if !self.nodes.contains(&node) {
+            self.nodes.push(node);
         }
     }
 
-    fn calculate_similarity(node1: &CarNode, node2: &CarNode) -> f64 {
-        let distance = ((node1.price - node2.price).powi(2) + (node1.mileage - node2.mileage).powi(2)).sqrt();
-        1.0 / (1.0 + distance)
+    // Adds an edge between two nodes. Assumes both nodes already exist in the graph.
+    pub fn add_edge(&mut self, node1: &str, node2: &str) {
+        let index1 = self.nodes.iter().position(|n| n == node1).unwrap();
+        let index2 = self.nodes.iter().position(|n| n == node2).unwrap();
+        self.edges.push((index1, index2));
     }
 
-    pub fn get_graph(&self) -> &Graph<CarNode, f64, Undirected> {
-        &self.graph
+    // Getter for nodes
+    pub fn nodes(&self) -> &Vec<String> {
+        &self.nodes
     }
+
+    // Getter for edges
+    pub fn edges(&self) -> &Vec<(usize, usize)> {
+        &self.edges
+    }
+}
+
+// Constructs a graph from the dataset, using the 'Brand' attribute as nodes and connecting all nodes with edges.
+pub fn build_graph(data: &[HashMap<String, String>]) -> Graph {
+    let mut graph = Graph::new();
+
+    // Add nodes to the graph
+    for entry in data {
+        if let Some(brand) = entry.get("Brand") {
+            graph.add_node(brand.clone());
+        }
+    }
+
+     // Add edges between all pairs of nodes
+     for i in 0..graph.nodes.len() {
+        for j in (i + 1)..graph.nodes.len() {
+            graph.add_edge(&graph.nodes[i], &graph.nodes[j]);
+        }
+    }
+    
+    graph
 }
