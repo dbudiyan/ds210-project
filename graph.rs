@@ -52,12 +52,16 @@ pub fn build_graph(data: &[HashMap<String, String>]) -> Graph {
         }
     }
 
-     // Add edges between all pairs of nodes
-     for i in 0..graph.nodes.len() {
-        for j in (i + 1)..graph.nodes.len() {
-            graph.add_edge(&graph.nodes[i], &graph.nodes[j]);
+    // Add edges between all pairs of nodes
+    let node_count = graph.nodes.len();
+    for i in 0..node_count {
+        for j in i + 1..node_count {
+            let node1 = &graph.nodes[i];  
+            let node2 = &graph.nodes[j];  
+
+            graph.add_edge(node1, node2);
         }
     }
-    
+
     graph
 }
