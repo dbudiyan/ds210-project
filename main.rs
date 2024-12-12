@@ -1,25 +1,21 @@
+mod data_processing;
 mod graph;
-mod clustering;
+mod centrality;
 
-use graph::GraphBuilder;
-use clustering::Clusterer;
+use data_processing::process_dataset;
+use graph::build_graph;
+use centrality::{calculate_closeness_centrality, calculate_betweenness_centrality};
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let file_path = "used_car_dataset.csv";
+fn main() {
+    // Entry point of the program. Provides an overview of what the program does.
+    println!("Centrality Measures Analysis Project");
 
-    // Step 1: Load graph
-    let mut graph = GraphBuilder::load_from_csv(file_path)?;
+    let processed_data = process_dataset("data/used_car_dataset.csv");
+    let graph = build_graph(&processed_data);
 
-    // Step 2: Add edges based on similarity
-    graph.add_edges(0.5); // Threshold similarity
+    let closeness = calculate_closeness_centrality(&graph);
+    let betweenness = calculate_betweenness_centrality(&graph);
 
-    // Step 3: Perform clustering
-    let clusters = Clusterer::k_means(&graph, 3); // Example: 3 clusters
-
-    // Step 4: Display clusters
-    for (i, cluster) in clusters.iter().enumerate() {
-        println!("Cluster {}: {:?}", i + 1, cluster);
-    }
-
-    Ok(())
+    println!("Closeness Centrality: {:#?}", closeness);
+    println!("Betweenness Centrality: {:#?}", betweenness);
 }
