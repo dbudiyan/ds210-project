@@ -1,7 +1,7 @@
 use crate::graph::Graph;
 use std::collections::{VecDeque};
 
-/// Calculates the shortest path distance between two nodes using BFS.
+// Calculates the shortest path distance between two nodes using BFS.
 fn bfs_shortest_path(graph: &Graph, start: usize) -> Vec<Option<usize>> {
     let mut distances = vec![None; graph.nodes().len()];
     let mut queue = VecDeque::new();
@@ -25,7 +25,7 @@ fn bfs_shortest_path(graph: &Graph, start: usize) -> Vec<Option<usize>> {
     distances
 }
 
-/// Calculates the closeness centrality for each node in the graph.
+// Calculates the closeness centrality for each node in the graph.
 pub fn calculate_closeness_centrality(graph: &Graph) -> Vec<f64> {
     let mut centrality = vec![0.0; graph.nodes().len()];
 
@@ -116,7 +116,7 @@ pub fn calculate_betweenness_centrality(graph: &Graph) -> Vec<f64> {
     centrality
 }
 
-/// Returns the indices of the nodes with the highest centrality values.
+// Returns the indices of the nodes with the highest centrality values.
 pub fn get_highest_centrality_indices(_graph: &Graph, closeness: &[f64], betweenness: &[f64]) -> (Option<usize>, Option<usize>) {
     // Find the node with the highest closeness centrality
     let max_closeness = closeness
