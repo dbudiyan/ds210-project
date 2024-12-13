@@ -36,7 +36,7 @@ impl Graph {
 }
 
 // Builds a tree structure
-pub fn build_tree_graph(data: &[HashMap<String, String>]) -> Graph {
+pub fn build_graph(data: &[HashMap<String, String>]) -> Graph {
     let mut graph = Graph::new();
 
     // Add nodes to the graph
@@ -57,4 +57,21 @@ pub fn build_tree_graph(data: &[HashMap<String, String>]) -> Graph {
     }
 
     graph
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_graph_construction() {
+        let data = vec![{
+            let mut map = std::collections::HashMap::new();
+            map.insert("Brand".to_string(), "Toyota".to_string());
+            map
+        }];
+
+        let graph = build_graph(&data);
+        assert_eq!(graph.nodes.len(), 1, "Graph should have one node.");
+    }
 }
