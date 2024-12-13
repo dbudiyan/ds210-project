@@ -99,3 +99,20 @@ pub fn calculate_betweenness_centrality(graph: &Graph) -> Vec<f64> {
 
     centrality
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::graph::Graph;
+
+    #[test]
+    fn test_centrality_measures() {
+        let graph = Graph {
+            nodes: vec!["Node1".to_string(), "Node2".to_string()],
+            edges: vec![(0, 1)],
+        };
+
+        let closeness = calculate_closeness_centrality(&graph);
+        assert_eq!(closeness.len(), 2, "Closeness centrality should have two values.");
+    }
+}
