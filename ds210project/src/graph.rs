@@ -59,6 +59,29 @@ pub fn build_graph(data: &[HashMap<String, String>]) -> Graph {
     graph
 }
 
+// Chevrolet subgraph
+pub fn build_subgraph(graph: &Graph, target_node: &str) -> Graph {
+    let mut subgraph = Graph::new();
+    let node_index = graph.nodes.iter().position(|n| n == target_node);
+
+    if let Some(index) = node_index {
+        subgraph.add_node(graph.nodes[index].clone());
+
+        for &(start, end) in &graph.edges {
+            if start == index || end == index {
+                let neighbor_index = if start == index { end } else { start };
+                subgraph.add_node(graph.nodes[neighbor_index].clone());
+                subgraph.add_edge(
+                    &graph.nodes[start],
+                    &graph.nodes[end],
+                );
+            }
+        }
+    }
+
+    subgraph
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
