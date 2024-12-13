@@ -33,12 +33,12 @@ pub fn calculate_closeness_centrality(graph: &Graph) -> Vec<f64> {
         // Calculate the shortest path distances from node `i` to all other nodes
         let distances = bfs_shortest_path(graph, i);
         
-        // Sum the distances (ignore unreachable nodes)
+        // Collect only reachable nodes and sum their distances
         let reachable_distances: Vec<usize> = distances.iter().filter_map(|&d| d).collect();
         let total_distance: usize = reachable_distances.iter().sum();
         let reachable_count = reachable_distances.len();
 
-        // Closeness centrality is normalized by the number of reachable nodes
+        // Calculate closeness centrality based on reachable nodes
         if total_distance > 0 && reachable_count > 1 {
             centrality[i] = (reachable_count as f64 - 1.0) / total_distance as f64;
         } else {
@@ -46,7 +46,7 @@ pub fn calculate_closeness_centrality(graph: &Graph) -> Vec<f64> {
         }
     }
 
-    // Normalize centrality values to be in the range [0, 1]
+    // Normalize the centrality values to [0, 1]
     let max_centrality = centrality.iter().cloned().fold(f64::MIN, f64::max);
     if max_centrality > 0.0 {
         centrality.iter_mut().for_each(|c| *c /= max_centrality);
@@ -64,6 +64,7 @@ pub fn calculate_betweenness_centrality(graph: &Graph) -> Vec<f64> {
         return centrality; // No centrality for graphs with fewer than 2 nodes
     }
 
+    // Calculate betweenness centrality for each node as a source
     for s in 0..node_count {
         let mut shortest_paths = vec![0.0; node_count];
         let mut dependencies = vec![0.0; node_count];
@@ -74,6 +75,7 @@ pub fn calculate_betweenness_centrality(graph: &Graph) -> Vec<f64> {
         shortest_paths[s] = 1.0;
         queue.push_back(s);
 
+        // Perform BFS and track shortest paths
         while let Some(v) = queue.pop_front() {
             stack.push(v);
             for &(start, end) in graph.edges() {
@@ -90,7 +92,8 @@ pub fn calculate_betweenness_centrality(graph: &Graph) -> Vec<f64> {
                 shortest_paths[w] += shortest_paths[v];
             }
         }
-
+        
+        // Calculate dependencies for betweenness centrality
         while let Some(w) = stack.pop() {
             for &v in &predecessors[w] {
                 dependencies[v] += (shortest_paths[v] / shortest_paths[w]) * (1.0 + dependencies[w]);
@@ -115,12 +118,14 @@ pub fn calculate_betweenness_centrality(graph: &Graph) -> Vec<f64> {
 
 /// Returns the indices of the nodes with the highest centrality values.
 pub fn get_highest_centrality_indices(_graph: &Graph, closeness: &[f64], betweenness: &[f64]) -> (Option<usize>, Option<usize>) {
+    // Find the node with the highest closeness centrality
     let max_closeness = closeness
         .iter()
         .enumerate()
         .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
         .map(|(idx, _)| idx);
 
+    // Find the node with the highest betweenness centrality
     let max_betweenness = betweenness
         .iter()
         .enumerate()
@@ -135,14 +140,52 @@ mod tests {
     use super::*;
     use crate::graph::Graph;
 
+    // Test for closeness centrality
     #[test]
-    fn test_centrality_measures() {
+    fn test_closeness_centrality() {
         let graph = Graph {
             nodes: vec!["Node1".to_string(), "Node2".to_string()],
-            edges: vec![(0, 1)],
+            edges: vec![(0, 1)], // Edge between Node1 and Node2
         };
 
         let closeness = calculate_closeness_centrality(&graph);
+
+        // Check that both nodes have non-zero closeness centrality
         assert_eq!(closeness.len(), 2, "Closeness centrality should have two values.");
+        assert!(closeness[0] > 0.0, "Node1 should have non-zero closeness centrality.");
+        assert!(closeness[1] > 0.0, "Node2 should have non-zero closeness centrality.");
+    }
+
+    // Test for betweenness centrality
+    #[test]
+    fn test_betweenness_centrality() {
+        let graph = Graph {
+            nodes: vec!["Node1".to_string(), "Node2".to_string()],
+            edges: vec![(0, 1)], // Edge between Node1 and Node2
+        };
+
+        let betweenness = calculate_betweenness_centrality(&graph);
+
+        // Betweenness should be zero for both nodes in this simple graph
+        assert_eq!(betweenness.len(), 2, "Betweenness centrality should have two values.");
+        assert_eq!(betweenness[0], 0.0, "Node1 should have zero betweenness centrality.");
+        assert_eq!(betweenness[1], 0.0, "Node2 should have zero betweenness centrality.");
+    }
+
+    // Test for getting the highest centrality indices
+    #[test]
+    fn test_get_highest_centrality_indices() {
+        let graph = Graph {
+            nodes: vec!["Node1".to_string(), "Node2".to_string(), "Node3".to_string()],
+            edges: vec![(0, 1), (1, 2)], // Chain of edges: Node1 <-> Node2 <-> Node3
+        };
+
+        let closeness = calculate_closeness_centrality(&graph);
+        let betweenness = calculate_betweenness_centrality(&graph);
+        let (max_closeness, max_betweenness) = get_highest_centrality_indices(&graph, &closeness, &betweenness);
+
+        // Node2 should have the highest centrality values in this simple linear graph
+        assert_eq!(max_closeness, Some(1), "Node2 should have the highest closeness centrality.");
+        assert_eq!(max_betweenness, Some(1), "Node2 should have the highest betweenness centrality.");
     }
 }
