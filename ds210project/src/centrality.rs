@@ -60,6 +60,10 @@ pub fn calculate_betweenness_centrality(graph: &Graph) -> Vec<f64> {
     let mut centrality = vec![0.0; graph.nodes().len()];
     let node_count = graph.nodes().len();
 
+    if node_count < 2 {
+        return centrality; // No centrality for graphs with fewer than 2 nodes
+    }
+
     for s in 0..node_count {
         let mut shortest_paths = vec![0.0; node_count];
         let mut dependencies = vec![0.0; node_count];
@@ -94,6 +98,15 @@ pub fn calculate_betweenness_centrality(graph: &Graph) -> Vec<f64> {
             if w != s {
                 centrality[w] += dependencies[w];
             }
+        }
+    }
+
+    // Normalize the betweenness centrality values
+    let max_possible = ((node_count - 1) * (node_count - 2)) as f64;
+
+    if max_possible > 0.0 {
+        for value in &mut centrality {
+            *value /= max_possible;
         }
     }
 
