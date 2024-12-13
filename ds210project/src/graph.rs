@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Graph {
-    nodes: Vec<String>,
-    edges: Vec<(usize, usize)>,
+    pub nodes: Vec<String>,
+    pub edges: Vec<(usize, usize)>,
 }
 
 impl Graph {
