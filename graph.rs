@@ -1,7 +1,7 @@
 use std::collections::HashMap;
+use rand::random; 
 
 #[derive(Debug)]
-// Represents a graph with nodes and edges, where nodes are strings and edges are pairs of node indices.
 pub struct Graph {
     nodes: Vec<String>,
     edges: Vec<(usize, usize)>,
@@ -41,7 +41,7 @@ impl Graph {
     }
 }
 
-// Constructs a graph from the dataset, using the 'Brand' attribute as nodes and connecting all nodes with edges.
+// Construct a graph with some realistic edges (not fully connected).
 pub fn build_graph(data: &[HashMap<String, String>]) -> Graph {
     let mut graph = Graph::new();
 
@@ -52,13 +52,15 @@ pub fn build_graph(data: &[HashMap<String, String>]) -> Graph {
         }
     }
 
-    // Add edges between all pairs of nodes
+    // Add some edges between random nodes (avoid complete graph)
     let nodes = graph.nodes.clone();
     let node_count = nodes.len();
-    
+
     for i in 0..node_count {
         for j in i + 1..node_count {
+            if rand::random::<f64>() < 0.5 {
             graph.add_edge(&nodes[i], &nodes[j]);
+            }
         }
     }
 
