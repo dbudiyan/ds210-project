@@ -13,7 +13,7 @@ fn main() {
     let processed_data = process_dataset("used_car_dataset.csv");
 
     // Build the main graph
-    let graph = build_tree_graph(&processed_data);
+    let graph = build_graph(&processed_data);
 
     // Compute centrality measures for the full graph
     let closeness = calculate_closeness_centrality(&graph);
