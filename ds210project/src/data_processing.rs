@@ -39,3 +39,27 @@ pub fn filter_by_attribute(
         .cloned()
         .collect()
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dataset_processing() {
+        let processed_data = process_dataset("used_car_dataset.csv");
+        assert!(!processed_data.is_empty(), "Processed dataset should not be empty.");
+    }
+
+    #[test]
+    fn test_filter_by_attribute() {
+        let data = vec![{
+            let mut map = std::collections::HashMap::new();
+            map.insert("Brand".to_string(), "Toyota".to_string());
+            map
+        }];
+
+        let filtered = filter_by_attribute(&data, "Brand", "Toyota");
+        assert_eq!(filtered.len(), 1, "Filtered data should contain one entry.");
+    }
+}
