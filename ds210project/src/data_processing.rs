@@ -27,20 +27,6 @@ pub fn process_dataset(file_path: &str) -> Vec<HashMap<String, String>> {
     dataset
 }
 
-// Filters the dataset based on a specific attribute and value.
-pub fn filter_by_attribute(
-    dataset: &[HashMap<String, String>],
-    attribute: &str,
-    value: &str,
-) -> Vec<HashMap<String, String>> {
-    dataset
-        .iter()
-        .filter(|entry| entry.get(attribute).map_or(false, |v| v == value))
-        .cloned()
-        .collect()
-}
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -49,17 +35,5 @@ mod tests {
     fn test_dataset_processing() {
         let processed_data = process_dataset("used_car_dataset.csv");
         assert!(!processed_data.is_empty(), "Processed dataset should not be empty.");
-    }
-
-    #[test]
-    fn test_filter_by_attribute() {
-        let data = vec![{
-            let mut map = std::collections::HashMap::new();
-            map.insert("Brand".to_string(), "Toyota".to_string());
-            map
-        }];
-
-        let filtered = filter_by_attribute(&data, "Brand", "Toyota");
-        assert_eq!(filtered.len(), 1, "Filtered data should contain one entry.");
     }
 }
