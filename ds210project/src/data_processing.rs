@@ -39,7 +39,7 @@ mod tests {
     #[test]
     fn test_dataset_processing() {
         // Process the dataset
-        let processed_data = process_dataset("used_car_dataset.csv");
+        let processed_data = process_dataset("src/used_car_dataset.csv");
         // Ensure the dataset is not empty
         assert!(!processed_data.is_empty(), "Processed dataset should not be empty.");
     }
