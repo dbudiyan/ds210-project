@@ -3,7 +3,7 @@ mod graph;
 mod centrality;
 
 use data_processing::{process_dataset, filter_by_attribute};
-use graph::{build_tree_graph, Graph};
+use graph::{build_graph, Graph};
 use centrality::{calculate_closeness_centrality, calculate_betweenness_centrality};
 
 fn main() {
